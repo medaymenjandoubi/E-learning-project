@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 const {Schema} =mongoose
+const { ObjectId } = mongoose.Types; 
 const userSchema = new Schema ({
     name: {
         type: String,
@@ -25,11 +26,21 @@ const userSchema = new Schema ({
     role: {
         type : [String],
         default : ["Subscriber"],
-        enum: ["Subscriber","instructor","Admin"]
+        enum: ["Subscriber","Instructor","Admin"]
     },
     stripe_account_id: '',
     stripe_seller: {},
     stripeSession: {},
+    passwordResetCode: {
+        data: String,
+        default: "",
+    },
+    courses: [
+        {
+          type: ObjectId,
+          ref: "Course",
+        },
+    ],
 },{timeStamps: true}
 );
 export default mongoose.model("User", userSchema)

@@ -3,7 +3,7 @@ import {Menu} from 'antd';
 import Link from 'next/link';
 import {AppstoreOutlined,
     CoffeeOutlined,
-LoginOutlined, LogoutOutlined, UserAddOutlined, } from '@ant-design/icons';
+LoginOutlined, LogoutOutlined, UserAddOutlined,CarryOutOutlined,TeamOutlined } from '@ant-design/icons';
 import {Context} from "../context";
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -19,7 +19,7 @@ const TopNav = () => {
     
     useEffect(()=> {
         process.browser && setCurrent(window.location.pathname)
-        console.log(window.location.pathname)
+        //console.log(window.location.pathname)
     },[process.browser && window.location.pathname])
 
     const logout= async () => {
@@ -31,12 +31,30 @@ const TopNav = () => {
     };
 
     return (
-        <Menu mode="horizontal" selectedKeys={[current]} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Menu mode="horizontal" selectedKeys={[current]} className='mb-2'>
         <Item key="/" onClick={e => setCurrent(e.key)} icon={<AppstoreOutlined />}>
             <Link href="/" legacyBehavior>
             <a>App</a>
             </Link>
         </Item>
+        {user && user.role && user.role.includes("Instructor") ? (
+
+            <Item key="/instructor/course/create" onClick={e => setCurrent(e.key)} icon={<CarryOutOutlined />}>
+                <Link href="/instructor/course/create" legacyBehavior>
+                    Create Course 
+                </Link>
+            </Item>
+
+        ) : (
+
+            <Item key="/user/become-instructor" onClick={e => setCurrent(e.key)} icon={<TeamOutlined />}>
+                <Link href="/user/become-instructor" legacyBehavior>
+                    Become Instructor 
+                </Link>
+            </Item>
+            
+        )}
+
         {user === null && (
             <>
             <Item key="/login" onClick={e => setCurrent(e.key)} icon={<LoginOutlined />}>
@@ -51,8 +69,16 @@ const TopNav = () => {
             </Item>
             </>
         )}
+        {user && user.role && user.role.includes("Instructor") && 
+            <Item key="/instructor" onClick={e => setCurrent(e.key)} icon={<TeamOutlined />} className='float-end'>
+                <Link href="/instructor" legacyBehavior>
+                    Instructor 
+                </Link>
+            </Item>
+        }
+    
         {user !== null && (
-        <SubMenu icon={<CoffeeOutlined/>} title={user && user.name} style={{ marginLeft: 'auto' }}>
+        <SubMenu icon={<CoffeeOutlined/>} title={user && user.name} className='float-end'>
             <Item key="/user">
                 <Link href="/user">
                     Dashboard
@@ -64,6 +90,7 @@ const TopNav = () => {
 
         </SubMenu>
         )}
+
 
         </Menu>
 

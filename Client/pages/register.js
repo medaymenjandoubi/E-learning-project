@@ -7,9 +7,9 @@ import Link from "next/link";
 import { Context } from "../context";
 import {useRouter} from "next/router"
 const Register = () => {
-    const [name,setName] =useState('aymen')
-    const [email,setEmail] =useState('medaymenjandoubi4@gmail.com')
-    const [password,setPassword] =useState('testetess1232')
+    const [name,setName] =useState('')
+    const [email,setEmail] =useState('')
+    const [password,setPassword] =useState('')
     const [loading, setLoading] = useState(false)
 
     const {state :{user},
@@ -28,6 +28,10 @@ const Register = () => {
                 // console.log('REGISTER RESPONSE',data)
                 toast.success('Registration succesfull. Please login');
                 setLoading(false)
+                setName('');
+                setPassword("");
+                setEmail("");
+                router.push("/login")
             } catch (err) {
                 toast.error(err.response.data)
                 setLoading(false)
