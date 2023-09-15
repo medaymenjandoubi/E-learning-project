@@ -1,14 +1,16 @@
 import express from "express"
 import formidable from "express-formidable";
 //middleware
-import { isInstructor, requireSignin } from "../middlewares";
+import { isInstructor, requireSignin ,isEnrolled} from "../middlewares";
 
 const router = express.Router();
 
 //import from controllers
 import {uploadImage,removeImage,create,update,readSingleCourse,uploadVideo,
-    removeVideo,addLesson,removeLesson,updateLesson,
-    publish,unpublish,courses,checkEnrollment,freeEnrollment,paidEnrollment,stripeSuccess} from '../controllers/course.js'
+        removeVideo,addLesson,removeLesson,updateLesson,publish,unpublish,
+        courses,checkEnrollment,freeEnrollment,paidEnrollment,stripeSuccess,
+        userCourses,markCompleted,listCompleted,markIncompleted} from '../controllers/course.js'
+
 import {instructorCourses} from '../controllers/instructor.js'
 
 
@@ -43,4 +45,11 @@ router.post("/free-enrollment/:courseId",requireSignin,freeEnrollment)
 router.post("/paid-enrollment/:courseId",requireSignin,paidEnrollment)
 router.get("/stripe-success/:courseId", requireSignin, stripeSuccess);
 
+
+
+router.get("/user-courses",requireSignin,userCourses);
+router.get(`/user/course/:slug`,requireSignin,isEnrolled,readSingleCourse);
+router.post("/mark-completed",requireSignin,markCompleted)
+router.post("/mark-incompleted",requireSignin,markIncompleted)
+router.post("/list-completed",requireSignin,listCompleted)
 module.exports = router;

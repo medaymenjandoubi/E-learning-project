@@ -6,6 +6,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET)
 
 var { nanoid } = require("nanoid");
 import {readFileSync} from "fs"
+import Completed from '../models/completed';
 const awsConfig = {
     accesKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccesKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -392,5 +393,69 @@ export const freeEnrollment = async (req, res) => {
         console.log("STRIPE SUCCESS ERR", err);
         res.json({ success: false });
       }
+ }
+ export const userCourses = async(req,res) => {
+    const user = await User.findById(req.auth._id).exec();
+    const courses = await Course.find({_id : { $in : user.courses } }).populate("instructor", "id name").exec();
+    res.json(courses)
+ }
+ export const markCompleted = async (req,res) => {
+    try {
+        const {courseId, lessonId} = req.body
+        /* console.log(courseId, lessonId) */
+        // First step we will check if user with that course is already created
+        const existing = await Completed.findOne({
+            user: req.auth._id,
+            course: courseId,
+        }).exec();
+        if (existing) {
+            //update
+            const updated = await Completed.findOneAndUpdate({
+                user : req.auth._id,
+                course : courseId ,
+            },{
+                $addToSet : {lessons : lessonId}
+            }).exec()
+            res.json({ok :true });
+        } else {
+            //create 
+            const created = await new Completed({
+                user :req.auth._id,
+                course : courseId,
+                lessons : lessonId
+            }).save();
+            res.json({ok : true});
+
+        }
+    } catch (error) {
+        console.log(error)
+    }
+ }
+ export const listCompleted = async(req,res)=>{
+    try {
+        const userId= req.auth._id;
+        const {courseId}= req.body;
+         const list = await Completed.findOne({
+            user : userId,
+            course: courseId
+         }).exec()
+         list && res.json(list.lessons)
+    } catch (err) {
+        console.log(err)
+    }
+ }
+ export const markIncompleted = async(req,res)=> {
+    try {
+        const {courseId, lessonId} = req.body
+        const updated = await Completed.findOneAndUpdate({
+            user : req.auth._id,
+            course : courseId ,
+        },{
+            $pull : {lessons : lessonId}
+        }).exec()
+        res.json({ok :true })
+    } catch (err) {
+        console.log(err)
+    }
  }
   
