@@ -330,7 +330,7 @@ export const freeEnrollment = async (req, res) => {
              .exec();
          if(!course.paid) return;
          //application fee 30%
-         const fee =(course.price);
+         const fee =(course.price*0);
          //create stripe session
          const session = await stripe.checkout.sessions.create({
              payment_method_types: ['card'],
@@ -343,7 +343,7 @@ export const freeEnrollment = async (req, res) => {
                          product_data: {
                              name: course.name,
                          },
-                         unit_amount: Math.round(course.price.toFixed(2) *100),
+                         unit_amount: Math.round(course.price*100),
                      },
                      quantity: 1,
                  },
@@ -456,6 +456,17 @@ export const freeEnrollment = async (req, res) => {
         res.json({ok :true })
     } catch (err) {
         console.log(err)
+    }
+ }
+ export const countStudents = async (req,res) => {
+    try {
+        const {courseId} = req.body;
+        const users = await User.find({
+            courses : courseId,
+        }).select('_id').exec();
+        res.json(users)
+    } catch (err) {
+     console.log(err)   
     }
  }
   

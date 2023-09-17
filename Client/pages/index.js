@@ -1,43 +1,39 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import CourseCard from "../components/cards/CourseCard";
+import { useSearch } from "../context/SearchContext";
 
+const Index = ({ courses }) => {
+  const { searchQuery } = useSearch();
+  const filteredCourses = courses.filter((course) =>
+    course.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-
-const Index = ({courses}) => {
-    /* const [courses,setCourses]=useState([]) */
-
-
-/*     useEffect(()=>{
-        const fetchCourses=async()=>{
-            const {data}= await axios.get(`/api/courses`)
-            setCourses(data);
-        };
-        fetchCourses();
-    },[]) */
-    return (
+  return (
     <>
-    
-    <h1 className="jumbotron text-center bg-primary">Online Education Marketplace</h1>
-    {/* <pre>{JSON.stringify(courses,null,4)}</pre> data flow test nothing more */}
-    <div className="container-fluid">
-        <div className="row">
-            {courses.map((course)=> 
+      <h1 className="jumbotron text-center bg-primary">
+        Online Education Marketplace
+      </h1>
+      <div className="container-fluid">
+        <div className="row bg-light p-2">
+          {filteredCourses.map((course) => (
             <div key={course._id} className="col-md-4">
-                <CourseCard course={course}/>
-            </div>)}
+              <CourseCard course={course} />
+            </div>
+          ))}
         </div>
-    </div>
+      </div>
     </>
-    );
+  );
 };
 
 export async function getServerSideProps() {
-    const {data} = await axios.get(`${process.env.API}/courses`)
-    return {
-        props : {
-            courses: data,
-        }
-    }
+  const { data } = await axios.get(`${process.env.API}/courses`);
+  return {
+    props: {
+      courses: data,
+    },
+  };
 }
+
 export default Index;

@@ -9,9 +9,7 @@ const router = express.Router();
 import {uploadImage,removeImage,create,update,readSingleCourse,uploadVideo,
         removeVideo,addLesson,removeLesson,updateLesson,publish,unpublish,
         courses,checkEnrollment,freeEnrollment,paidEnrollment,stripeSuccess,
-        userCourses,markCompleted,listCompleted,markIncompleted} from '../controllers/course.js'
-
-import {instructorCourses} from '../controllers/instructor.js'
+        userCourses,markCompleted,listCompleted,markIncompleted,countStudents} from '../controllers/course.js'
 
 
 router.get("/courses", courses)
@@ -21,7 +19,7 @@ router.post('/course/remove-image',removeImage)
 
 //course 
 router.post('/course',requireSignin,isInstructor,create)
-router.get("/instructor-courses",requireSignin,instructorCourses);
+
 router.get(`/course/:slug`,readSingleCourse);
 router.put('/course/:slug',requireSignin,update)
 //publish unpublish course routes 
@@ -46,10 +44,15 @@ router.post("/paid-enrollment/:courseId",requireSignin,paidEnrollment)
 router.get("/stripe-success/:courseId", requireSignin, stripeSuccess);
 
 
-
+//get routes for all & single courses of a user 
 router.get("/user-courses",requireSignin,userCourses);
 router.get(`/user/course/:slug`,requireSignin,isEnrolled,readSingleCourse);
+
+// routes for complete&incomplete lessons managment
 router.post("/mark-completed",requireSignin,markCompleted)
 router.post("/mark-incompleted",requireSignin,markIncompleted)
 router.post("/list-completed",requireSignin,listCompleted)
+
+//route to count enrolled users in course
+router.post('/instructor/student-count',requireSignin,countStudents)
 module.exports = router;

@@ -3,15 +3,18 @@ import  { useRouter } from "next/router";
 import InstructorRoute from "../../../../components/routes/InstructorRoute";
 import axios from "axios";
 import { Avatar ,Tooltip, Button,Modal,List} from "antd";
-import { EditOutlined,CheckOutlined, UploadOutlined, QuestionOutlined, CloseOutlined } from "@ant-design/icons";
+import { EditOutlined,CheckOutlined, UploadOutlined, QuestionOutlined, CloseOutlined, UserSwitchOutlined } from "@ant-design/icons";
 import AddLessonForm from "../../../../components/forms/AddLessonsForm";
 import ReactMarkdown from "react-markdown"
 import { toast } from "react-toastify";
 import Item from "antd/lib/list/Item";
 const CourseView = () => {
+ 
  const [course,setCourse] = useState({});
+ 
  //state for lessons display
  const [visible,setVisible] = useState(false);
+
  //state that will save the lesson content 
  const [values,setValues] = useState({
     title: "",
@@ -20,16 +23,34 @@ const CourseView = () => {
  });
  //state for the button to submit lesson add form in the modal AddLessonsForm.js 
  const [uploading,setUploading]=useState(false);
+
  //state to make video upload input text dynamic 
  const [uploadButtonText,setUploadButtonText]=useState('Upload Video')
-const [progress,setProgress] =useState(0);
+ const [progress,setProgress] =useState(0);
+ 
+  //state to count users enrolled in course 
+  const [students,setStudents]= useState(0)
+ 
  const router = useRouter();
+
  const {slug} = router.query;
 
  useEffect(() => {
     loadcourse()
  }, [slug])
 
+ useEffect(() => {
+    course && studentCount()
+ }, [course])
+  
+ const studentCount = async() =>{
+    const {data} = await axios.post(`/api/instructor/student-count`, {
+        courseId: course._id
+    })
+    setStudents(data.length)
+    console.log("STUDENT COUNT", data)
+    console.log("students count test",students)
+  }
 const loadcourse=async()=> {
     const {data}= await axios.get(`/api/course/${slug}`)
     setCourse(data);
@@ -157,6 +178,12 @@ const handleUnpublish =async (e,courseId) => {
                     </div>
                     
                     <div style={{ marginLeft: 'auto', marginTop: '20px' }}>
+                            <Tooltip title={`${students} Enrolled`}>
+                                <UserSwitchOutlined
+                                    className="h5 pointer text-info"
+                                    style={{ marginRight: '10px' }} // Add right margin for spacing
+                                />
+                            </Tooltip>
                         <Tooltip title="Edit">
                             <EditOutlined
                                 onClick={() => router.push(`/instructor/course/edit/${slug}`)}

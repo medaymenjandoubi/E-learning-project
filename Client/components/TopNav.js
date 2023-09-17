@@ -8,7 +8,8 @@ import {Context} from "../context";
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import {useRouter} from "next/router"
-
+import SearchBar from './SearchBar';
+import { useSearch } from '../context/SearchContext';
 const {Item,SubMenu,ItemGroup} = Menu; 
 
 const TopNav = () => {
@@ -16,7 +17,12 @@ const TopNav = () => {
     const { state,dispatch } = useContext(Context);
     const { user } = state;
     const router=useRouter();
-    
+    const { searchQuery, setSearchQuery } = useSearch();
+
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+      };
+
     useEffect(()=> {
         process.browser && setCurrent(window.location.pathname)
         //console.log(window.location.pathname)
@@ -31,12 +37,14 @@ const TopNav = () => {
     };
 
     return (
-        <Menu mode="horizontal" selectedKeys={[current]} className='mb-2'>
-        <Item key="/" onClick={e => setCurrent(e.key)} icon={<AppstoreOutlined />}>
+        <Menu theme="dark" mode="horizontal" selectedKeys={[current]} className='mb-2'>
+        {user !== null &&  <Item key="/" onClick={e => setCurrent(e.key)} icon={<AppstoreOutlined />}>
             <Link href="/" legacyBehavior>
-            <a>App</a>
+            <a>RapydLearn</a>
             </Link>
-        </Item>
+        </Item>}
+        
+        
         {user && user.role && user.role.includes("Instructor") ? (
 
             <Item key="/instructor/course/create" onClick={e => setCurrent(e.key)} icon={<CarryOutOutlined />}>
@@ -54,7 +62,9 @@ const TopNav = () => {
             </Item>
             
         )}
-
+        <Item style={{width:'800px', marginLeft:"15%"}} className='itemsearchbar'>
+            <SearchBar onSearch={handleSearch} />
+        </Item>
         {user === null && (
             <>
             <Item key="/login" onClick={e => setCurrent(e.key)} icon={<LoginOutlined />}>
